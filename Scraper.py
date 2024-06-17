@@ -6,8 +6,9 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
-from typing import Dict
+from typing import Dict, List
 import time
+
 
 class Scraper:
     def __init__(self, company: str, country: str):
@@ -17,7 +18,7 @@ class Scraper:
             self.country = "US"
         else:
             self.country = country
-    def scrape_all_results(self) -> Dict[str, str]:
+    def scrape_all_results(self) -> Dict[str, List[str]]:
         # Setup dictionary to return
         duns_numbers = {}
         # Setup Chrome options
@@ -68,9 +69,11 @@ class Scraper:
                 for card in result_cards:
                     company = card.find_element(By.XPATH, ".//a[contains(@class, 'company-title')]")
                     details = card.find_element(By.XPATH, ".//div[contains(@class, 'detail')]")
+                    address = card.find_element(By.XPATH, ".//p[contains(@class, 'paragraph')]")
                     details_list = details.text.split(':')
                     number = details_list[1].strip()
-                    duns_numbers[company.text] = number
+                    return_list = [number, address.text]
+                    duns_numbers[company.text] = return_list
             else:
                 print("No results found")
                 duns_numbers[self.company] = "N/A"
@@ -84,7 +87,7 @@ class Scraper:
         print(len(duns_numbers))
         driver.quit()
 
-    def scrape_top_result(self) -> Dict[str, str]:
+    def scrape_top_result(self) -> Dict[str, List[str]]:
         # Setup dictionary to return
         duns_numbers = {}
         # Setup Chrome options
@@ -135,9 +138,11 @@ class Scraper:
                 card = result_cards[0]
                 company = card.find_element(By.XPATH, ".//a[contains(@class, 'company-title')]")
                 details = card.find_element(By.XPATH, ".//div[contains(@class, 'detail')]")
+                address = card.find_element(By.XPATH, ".//p[contains(@class, 'paragraph')]")
                 details_list = details.text.split(':')
                 number = details_list[1].strip()
-                duns_numbers[company.text] = number
+                return_list = [number, address.text]
+                duns_numbers[company.text] = return_list
             else:
                 print("No results found")
                 duns_numbers[self.company] = "N/A"
