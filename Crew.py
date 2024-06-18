@@ -79,19 +79,19 @@ duns_support_agent = Agent(
 		"research to {person}, a super important customer "
         " to you."
 		"You need to make sure that you provide the best research and find all necessary information!"
-		"You will take the outut from the previous agents and fill in for the DUNS number and address for each company in {company}."
-        "Your information should replace the existing information, unless you get a 'N/A' for a DUNS number or address for that company"
+		"You will take the outut from the previous agents and fill in for the DUNS number and mailing address for each company in {company}."
+        "Your information should replace the existing information, unless you get a 'N/A' for a DUNS number or mailing address for that company"
 		"Make sure to provide full complete answers for each company in {company}, provide necessary links of where information was gathered "
-        "and make no assumptions. The information you will be finding for each company will be: DUNS number and address"
-        "To find the DUNS number and address for each company, use the DUNS Scraper Tool. When using this tool, please provide the company name and the country code."
+        "and make no assumptions. The information you will be finding for each company will be: DUNS number and mailing address"
+        "To find the DUNS number and mailing address for each company, use the DUNS Scraper Tool. When using this tool, please provide the company name and the country code."
         "The country code is the two-letter code for the country, for example, US for United States."
-        "The result is a string with the DUNS number and the address separated by a '|'."
-        "You must break the result into two variables, the DUNS number and the address."
+        "The result is a string with the DUNS number and the mailing address separated by a '|'."
+        "You must break the result into two variables, the DUNS number and the mailing address."
         "You will have to use this tool each time for each company in {company}. You can only enter one company and country at a time for this tool."
         "For example, if we have Google, Lenovo, and Microsoft as our list of companies, you will have to use this tool 3 times to retrieve all necessary information."
-        "So the first entry into the tool would be 'company=Google, country=US'. After you get the first result the second entry would be 'company=Lenovo, country=US'. And you do this for each company in {company}"
+        "So the first argument into the tool would be 'Google'. After you get the first result the next argument put in would be 'Lenovo'. And you do this for each company in {company}"
         "As can be seen from the example, you may have to use this tool mutliple times in order to retrieve all necessary information."
-        "The information you gained should trump all previous information and you should update the existing information as such for the DUNS number and address."
+        "The information you gained should be updates as such for only the DUNS number and mailing address."
     ),
 	allow_delegation=False,
 	verbose=True,
@@ -115,9 +115,9 @@ scac_support_agent = Agent(
         "and make no assumptions. The information you will be finding for each company will be: SCAC Code"
         "You will have to use this tool each time for each company in {company}. You can only enter one company at a time for this tool."
         "For example, if we have Google, Lenovo, and Microsoft as our list of companies, you will have to use this tool 3 times to retrieve all necessary information."
-        "So the first entry into the tool would be 'company=Google'. After you get the first result the second entry would be 'company=Lenovo'. And you do this for each company in {company}"
+        "So the first argument into the tool would be 'Google'. After you get the first result the next argument put in would be 'Lenovo'. And you do this for each company in {company}"
         "As can be seen from the example, you may have to use this tool mutliple times in order to retrieve all necessary information."
-        "The information you gained should trump all previous information and you should update the existing information as such for the SCAC code."
+        "The information you gained should be updated as such for only the SCAC code."
 	),
 	allow_delegation=False,
 	verbose=True,
@@ -182,25 +182,23 @@ duns_inquiry_resolution = Task(
         "to provide the best answers possible for these companies: {company}."
 		"You must strive to provide a complete "
         "and accurate response to the customer's inquiry."
-        "To find the DUNS number and address for the company, use the DUNS Scraper Tool. When using this tool, please provide the company name and the country code."
+        "To find the DUNS number and mailing address for the company, use the DUNS Scraper Tool. When using this tool, please provide the company name and the country code."
         "The country code is the two-letter code for the country, for example, US for United States."
-        "The result is a string with the DUNS number and the address separated by a '|'."
-        "You must break the result into two variables, the DUNS number and the address."
+        "The result is a string with the DUNS number and the mailing address separated by a '|'."
+        "You must break the result into two variables, the DUNS number and the mailing address."
         "You will have to use this tool each time for each company in {company}. You can only enter one company and country at a time for this tool."
         "So you may have to use this tool mutliple times in order to retrieve all necessary information."
+        "The information you gained should trump all previous information and you should update the existing information as such for the DUNS number and mailing address only."
+        "Only use this tool once for each company in {company}."
     ),
     expected_output=(
-	    "A detailed, informative response to the "
-        "customer's inquiry that addresses "
+	    "A JSON that addresses "
         "all aspects of their question.\n"
         "The response should include the following for each company in {company}: Company email (using company email, not a personal gmail or other commercial mail)," \
-           f"phone number (company phone number, not personal), country, full corporate mailing address,"\
-           f"corporate website address, Tax Identifier (whatever tax id is appropriate in their country), DUNS, and SCAC (if NA Carrier)."
-        "Include everything you used to find the answer, "
-        "including external data or solutions. "
-        "Ensure the answer is complete and in proper JSON format, "
-		"leaving no questions unanswered, and maintain a helpful and friendly "
-		"tone throughout."
+        f"phone number (company phone number, not personal), country, full corporate mailing address,"\
+        f"corporate website address, Tax Identifier (whatever tax id is appropriate in their country), DUNS, and SCAC (if NA Carrier)."
+        "Ensure that the information you find on DUNS and mailing address replaces existing information in the JSON."
+        "Ensure the answer is complete and in proper JSON format."
     ),
     agent=duns_support_agent,
 )
@@ -213,19 +211,20 @@ scac_inquiry_resolution = Task(
         "to provide the best answers possible for these companies: {company}."
 		"You must strive to provide a complete "
         "and accurate response to the customer's inquiry."
+        "To find the SCAC code for each company, use the SCAC Scraper Tool. When using this tool, please provide the company name."
+        "You will have to use this tool each time for each company in {company}. You can only enter one company at a time for this tool."
+        "So you may have to use this tool mutliple times in order to retrieve all necessary information."
+        "The information you gained should trump all previous information and you should update the existing information as such for the SCAC code only."
+        "Only use this tool once for each company in {company}."
     ),
     expected_output=(
-	    "A detailed, informative response to the "
-        "customer's inquiry that addresses "
+	    "A JSON that addresses "
         "all aspects of their question.\n"
         "The response should include the following for each company in {company}: Company email (using company email, not a personal gmail or other commercial mail)," \
            f"phone number (company phone number, not personal), country, full corporate mailing address,"\
            f"corporate website address, Tax Identifier (whatever tax id is appropriate in their country), DUNS, and SCAC (if NA Carrier)."
-        "Include everything you used to find the answer, "
-        "including external data or solutions. "
-        "Ensure the answer is complete and in proper JSON format, "
-		"leaving no questions unanswered, and maintain a helpful and friendly "
-		"tone throughout."
+        "Ensure that the information you find on SCAC replaces existing information in the JSON."
+        "Ensure the answer is complete and in proper JSON format."
     ),
     agent=scac_support_agent,
 )
