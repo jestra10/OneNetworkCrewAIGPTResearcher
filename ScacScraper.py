@@ -11,6 +11,9 @@ class ScacScraper:
     def __init__(self,):
         self.PATH = "C:\\Program Files (x86)\\chromedriver.exe"
 
+    '''RETURNS: str
+    This method returns the SCAC code for a given company name.
+    '''
     def scrape_all_results(self,  company: str) -> str:
         # Setup Chrome options
         chrome_options = Options()
@@ -76,6 +79,9 @@ class ScacScraper:
         driver.quit()
         return scac_code
 
+    '''RETURNS: str
+    This method returns the company name for a given SCAC code.
+    '''
     def check_results(self, code: str) -> str:
         # Setup Chrome options
         chrome_options = Options()

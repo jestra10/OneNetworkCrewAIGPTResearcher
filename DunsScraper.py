@@ -13,6 +13,85 @@ class DunsScraper:
     def __init__(self):
         self.PATH = "C:\\Program Files (x86)\\chromedriver.exe"
 
+    '''RETURNS: str
+    This method returns the top result from the search of the DUNS website.
+    '''
+    def scrape_top_result_str(self, company: str, country: str) -> str:
+        # Check if the country is provided, if not, set it to US
+        if (country is None):
+            country = "US"
+        else:
+            country = country
+        # Setup Chrome options
+        chrome_options = Options()
+        chrome_options.add_argument('--ignore-certificate-errors')
+        chrome_options.add_argument('--ignore-ssl-errors')
+        chrome_options.add_argument('--log-level=3')
+
+        # Initialize the service object
+        service = Service(self.PATH)
+
+        # Initialize the webdriver with the service
+        driver = webdriver.Chrome(service=service)
+
+        # Open the target website
+        driver.get("https://www.dnb.com/de-de/upik.html?new=1")
+
+        # Wait until the dropdown and search box elements are present
+        wait = WebDriverWait(driver, 15)
+        try:
+            dropdown = wait.until(EC.presence_of_element_located((By.ID, "country")))
+            search_box = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[class*='searchUpikInputBox']")))
+        except:
+            print("Error in locating dropdown or search box")
+            driver.quit()
+            duns_numbers = "N/A"
+            return duns_numbers
+
+        try:
+            # Select a country option from the dropdown menu
+            select = Select(dropdown)
+            select.select_by_value(country)
+            # Type into the search box the company name
+            search_box.send_keys(company)
+            # Submit the search form (if there is a specific button to submit the form)
+            search_box.send_keys(Keys.RETURN)
+        except:
+            print("Error in selecting dropdown or typing into search box")
+            driver.quit()
+            duns_numbers = "N/A"
+            return duns_numbers
+
+        # Wait for the results to load and perform further actions
+        try:
+            result = wait.until(EC.presence_of_element_located((By.XPATH, "//div[contains(@class, 'upik-search-result-paper')]")))
+            # Retrieve the list of results
+            result_cards = result.find_elements(By.XPATH, "//div[contains(@class, 'upik-search-result-item-card')]")
+            # Check if there are any results
+            if len(result_cards) > 0:
+                # For each result, retrieve the DUNS and address
+                card = result_cards[0]
+                details = card.find_element(By.XPATH, ".//div[contains(@class, 'detail')]")
+                address = card.find_element(By.XPATH, ".//p[contains(@class, 'paragraph')]")
+                details_list = details.text.split(':')
+                number = details_list[1].strip()
+                duns_numbers = number + "|" + address.text
+            else:
+                print("No results found")
+                duns_numbers = "N/A"
+                driver.quit()
+                return duns_numbers
+        except:
+            print("Error in locating result cards")
+            driver.quit()
+            duns_numbers = "N/A"
+            return duns_numbers
+        # Close the browser
+        print(duns_numbers)
+        print(len(duns_numbers))
+        driver.quit()
+        return duns_numbers
+
     '''RETURNS: Dict[str, List[str]]
     This method returns all the results from the search of the DUNS website.
     The key to the dictionary is a company name and the value is a list of two strings:
