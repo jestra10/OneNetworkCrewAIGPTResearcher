@@ -2,11 +2,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
-from typing import Dict, List
 import time
 
 class ScacScraper:
@@ -143,5 +141,5 @@ class ScacScraper:
         
 if __name__=="__main__": 
     scraper_instance = ScacScraper()
-    scraper_instance.scrape_all_results(company="HDSFHIUHEIUFHEI")
+    scraper_instance.scrape_all_results(company="FedEx")
     # scraper_instance.check_results(code="JDSFIJSD")

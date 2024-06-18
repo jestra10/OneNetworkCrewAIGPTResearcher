@@ -85,6 +85,8 @@ class DunsScraper:
             else:
                 print("No results found")
                 duns_numbers[company] = "N/A"
+                driver.quit()
+                return duns_numbers
         except:
             print("Error in locating result cards")
             driver.quit()
@@ -168,10 +170,13 @@ class DunsScraper:
             else:
                 print("No results found")
                 duns_numbers[company] = "N/A"
+                driver.quit()
+                return duns_numbers
         except:
             print("Error in locating result cards")
             driver.quit()
             duns_numbers[company] = "N/A"
+            print(duns_numbers)
             return duns_numbers
         # Close the browser
         driver.quit()
